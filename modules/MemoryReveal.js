@@ -13,11 +13,14 @@ export class MemoryReveal {
   }
 
   async loadImage(source) {
-    const image = new Image();
-    image.decoding = 'async';
-    image.src = source;
-    await image.decode();
-    return image;
+    return new Promise((resolve, reject) => {
+      const image = new Image();
+      image.decoding = 'async';
+      image.onload = () => resolve(image);
+      image.onerror = () => reject(new Error(`Unable to load memory image: ${source}`));
+      image.src = source;
+      if (image.complete && image.naturalWidth > 0) resolve(image);
+    });
   }
 
   createSignalMap(image) {
@@ -65,7 +68,7 @@ export class MemoryReveal {
   }
 
   async load() {
-    await Promise.all(this.memories.map(async (memory) => {
+    const results = await Promise.allSettled(this.memories.map(async (memory) => {
       const image = await this.loadImage(memory.image);
       this.assets.set(memory.id, {
         image,
@@ -73,6 +76,8 @@ export class MemoryReveal {
         signalOnly: Boolean(memory.signalOnly),
       });
     }));
+    const failures = results.filter((result) => result.status === 'rejected');
+    if (failures.length) console.warn(`${failures.length} memory image(s) could not be loaded.`);
   }
 
   resize() {
@@ -241,11 +246,11 @@ export class MemoryReveal {
   }
 
   drawRecoveredImage(asset, clarity) {
-    const recovered = this.smooth((clarity - .57) / .43);
+    const recovered = this.smooth((clarity - .42) / .58);
     if (recovered <= 0) return;
     const ctx = this.context;
     const fit = this.fit(asset.image);
-    const maxOpacity = asset.signalOnly ? .018 : .93;
+    const maxOpacity = asset.signalOnly ? .82 : .95;
     const shift = (1 - recovered) * 5;
 
     ctx.save();

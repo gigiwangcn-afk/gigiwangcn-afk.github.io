@@ -1,8 +1,8 @@
-import { RadioDial } from './modules/RadioDial.js?v=20260717-mobile-2';
-import { SignalNoise } from './modules/SignalNoise.js?v=20260717-mobile-2';
-import { Waveform } from './modules/Waveform.js?v=20260717-mobile-2';
-import { MemoryReveal } from './modules/MemoryReveal.js?v=20260717-mobile-2';
-import { AudioController } from './modules/AudioController.js?v=20260717-mobile-2';
+import { RadioDial } from './modules/RadioDial.js?v=20260717-mobile-3';
+import { SignalNoise } from './modules/SignalNoise.js?v=20260717-mobile-3';
+import { Waveform } from './modules/Waveform.js?v=20260717-mobile-3';
+import { MemoryReveal } from './modules/MemoryReveal.js?v=20260717-mobile-3';
+import { AudioController } from './modules/AudioController.js?v=20260717-mobile-3';
 
 // 增加频道只需在这里加入一个对象。影像会自动经历载波聚合与信号恢复。
 const memories = [
