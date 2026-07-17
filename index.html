@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#d7d0bd" />
+    <meta
+      name="description"
+      content="Memory Frequency｜记忆频率——一台接收二十岁声音记忆的模拟电台装置。"
+    />
+    <title>Memory Frequency｜记忆频率</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <main class="installation" aria-label="记忆频率互动电台装置">
+      <div class="room-noise" aria-hidden="true"></div>
+
+      <article class="receiver" id="receiver">
+        <header class="receiver__header">
+          <div class="identity">
+            <p class="serial">ARCHIVE RECEIVER · MF—20</p>
+            <h1>MEMORY FREQUENCY <span>记忆频率</span></h1>
+            <div class="identity__index" aria-label="档案编号">
+              <span>MEMORY FILE: 04</span>
+              <span>AGE: 20 YEARS</span>
+              <span>FORMAT: A/V TRACE</span>
+            </div>
+          </div>
+          <div class="power-unit">
+            <span class="power-status">RECEIVER<br />STATUS</span>
+            <span class="power-lamp" id="powerLamp" aria-hidden="true"></span>
+            <button class="power-switch" id="powerSwitch" type="button" aria-pressed="false">
+              <span>RECEIVE</span>
+              <span class="power-switch__cn">启动接收</span>
+            </button>
+          </div>
+        </header>
+
+        <div class="receiver__body">
+          <section class="memory-window" aria-label="记忆影像接收区域">
+            <canvas id="memoryCanvas"></canvas>
+            <canvas id="noiseCanvas" aria-hidden="true"></canvas>
+            <div class="glass-wash" aria-hidden="true"></div>
+            <div class="scan-beam" aria-hidden="true"></div>
+            <div class="memory-reticle" aria-hidden="true">
+              <i></i><i></i><i></i><i></i>
+            </div>
+            <div class="memory-register" aria-hidden="true">
+              <span>VTR / 20—04</span>
+              <span>SCAN 625</span>
+              <span>ΔT 00:20</span>
+            </div>
+
+            <div class="memory-meta">
+              <div>
+                <p class="micro-label">RECEIVED FRAGMENT</p>
+                <p class="memory-title" id="memoryTitle">— — —</p>
+              </div>
+              <p class="memory-date" id="memoryDate">NO SIGNAL</p>
+            </div>
+
+            <div class="acquisition" id="acquisition">
+              <span class="acquisition__mark"></span>
+              <span id="acquisitionText">SEARCHING / 搜寻中</span>
+            </div>
+          </section>
+
+          <aside class="tuner" aria-label="调频控制区">
+            <div class="frequency-display">
+              <div class="frequency-display__top">
+                <span>ARCHIVE BAND / 87.5—108</span>
+                <span id="signalState">STATIC</span>
+              </div>
+              <div class="frequency-reading" aria-live="polite">
+                <span id="frequencyValue">90.2</span><small>MHz</small>
+              </div>
+              <div class="frequency-track" aria-hidden="true">
+                <span>87.5</span><i></i><span>94</span><i></i><span>101</span><i></i><span>108</span>
+                <b id="trackNeedle"></b>
+              </div>
+            </div>
+
+            <div class="signal-module">
+              <div class="module-heading">
+                <span>SIGNAL TRACE</span>
+                <span id="signalPercent">00%</span>
+              </div>
+              <canvas id="waveformCanvas" aria-label="实时信号波形"></canvas>
+              <div class="strength" aria-label="信号强度">
+                <span class="strength__label">GAIN</span>
+                <div class="strength__bars" id="strengthBars" aria-hidden="true">
+                  <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+                </div>
+              </div>
+            </div>
+
+            <div class="dial-zone">
+              <div class="dial-caption">
+                <span>MEMORY FREQUENCY RING</span>
+                <span>调谐 / 记忆检索</span>
+              </div>
+              <div class="dial-assembly">
+                <div class="dial-orbit" aria-hidden="true">
+                  <span class="orbit-wave orbit-wave--one"></span>
+                  <span class="orbit-wave orbit-wave--two"></span>
+                </div>
+                <div class="dial-scale" aria-hidden="true">
+                  <span class="memory-notch notch-a"></span>
+                  <span class="memory-notch notch-b"></span>
+                  <span class="memory-notch notch-c"></span>
+                  <span class="memory-notch notch-d"></span>
+                  <span class="dial-number dial-number--min">87.5</span>
+                  <span class="dial-number dial-number--mid">98</span>
+                  <span class="dial-number dial-number--max">108</span>
+                </div>
+                <button
+                  class="radio-dial"
+                  id="radioDial"
+                  type="button"
+                  role="slider"
+                  aria-label="记忆频率调谐旋钮"
+                  aria-valuemin="87.5"
+                  aria-valuemax="108"
+                  aria-valuenow="90.2"
+                  aria-valuetext="90.2 MHz"
+                >
+                  <span class="radio-dial__face">
+                    <span class="radio-dial__glass" aria-hidden="true"></span>
+                    <span class="radio-dial__indicator"></span>
+                    <span class="radio-dial__center"></span>
+                  </span>
+                </button>
+                <div class="dial-core-label" aria-hidden="true">
+                  <span>MF</span>
+                  <small>20</small>
+                </div>
+              </div>
+              <p class="dial-help">ROTATE / SCROLL / ← → <span>缓慢调谐</span></p>
+            </div>
+          </aside>
+        </div>
+
+        <footer class="receiver__footer">
+          <div class="footer__label">
+            <span>PERSONAL SOUND ARCHIVE</span>
+            <small>PRIVATE COLLECTION / AGE 20</small>
+          </div>
+          <div class="footer__center">
+            <p id="memoryCaption"></p>
+            <div class="memory-index" aria-label="记忆档案索引">
+              <span data-memory="park-mp3">01 PARK BENCH</span>
+              <span data-memory="sunset-bus">02 BUS WINDOW</span>
+              <span data-memory="window-cat">03 WINDOW CAT</span>
+              <span data-memory="sky-chimes">04 SKY CHIMES</span>
+            </div>
+          </div>
+          <div class="footer__chapter">
+            <span>CH.04 / 20 YEARS</span>
+            <small>ARCHIVE STATUS: ACTIVE</small>
+          </div>
+        </footer>
+      </article>
+
+      <p class="wall-note">请佩戴耳机 · 调慢一点</p>
+    </main>
+
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>
