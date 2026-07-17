@@ -8,6 +8,7 @@ export class MemoryReveal {
     this.clarity = 0;
     this.renderClarity = 0;
     this.channelChange = performance.now();
+    this.mobileMode = window.matchMedia('(pointer: coarse)').matches || window.innerWidth <= 760;
     this.resize();
   }
 
@@ -76,7 +77,8 @@ export class MemoryReveal {
 
   resize() {
     const bounds = this.canvas.getBoundingClientRect();
-    const scale = Math.min(1.6, window.devicePixelRatio || 1);
+    this.mobileMode = window.matchMedia('(pointer: coarse)').matches || window.innerWidth <= 760;
+    const scale = this.mobileMode ? 1 : Math.min(1.6, window.devicePixelRatio || 1);
     this.canvas.width = Math.max(1, Math.floor(bounds.width * scale));
     this.canvas.height = Math.max(1, Math.floor(bounds.height * scale));
   }
@@ -151,8 +153,8 @@ export class MemoryReveal {
   drawWaveImage(asset, clarity, now) {
     const ctx = this.context;
     const { width, height } = this.canvas;
-    const lineCount = Math.round(18 + clarity * 62);
-    const xStep = Math.max(3, Math.round(width / 230));
+    const lineCount = this.mobileMode ? Math.round(12 + clarity * 34) : Math.round(18 + clarity * 62);
+    const xStep = Math.max(this.mobileMode ? 6 : 3, Math.round(width / (this.mobileMode ? 125 : 230)));
     const phase = now * .0032;
     const imageMix = this.smooth((clarity - .04) / .72);
     const signalOnlyBoost = asset.signalOnly ? 1.38 : 1;
@@ -197,8 +199,8 @@ export class MemoryReveal {
     const ctx = this.context;
     const { width, height } = this.canvas;
     const reveal = this.smooth((clarity - .1) / .78);
-    const stepX = asset.signalOnly ? 6 : 9;
-    const stepY = asset.signalOnly ? 5 : 8;
+    const stepX = (asset.signalOnly ? 6 : 9) * (this.mobileMode ? 1.8 : 1);
+    const stepY = (asset.signalOnly ? 5 : 8) * (this.mobileMode ? 1.8 : 1);
     const jitter = (1 - reveal) * 14;
     const phase = now * .004;
     const threshold = .08 + (1 - reveal) * .48;
@@ -312,10 +314,12 @@ export class MemoryReveal {
     ctx.save();
     ctx.strokeStyle = 'rgba(179, 193, 172, .11)';
     ctx.lineWidth = Math.max(.7, window.devicePixelRatio || 1);
-    for (let line = 0; line < 21; line += 1) {
-      const baseY = (line / 20) * height;
+    const lineCount = this.mobileMode ? 12 : 21;
+    const xStep = this.mobileMode ? 18 : 12;
+    for (let line = 0; line < lineCount; line += 1) {
+      const baseY = (line / (lineCount - 1)) * height;
       ctx.beginPath();
-      for (let x = 0; x <= width; x += 12) {
+      for (let x = 0; x <= width; x += xStep) {
         const interference = Math.sin(x * .031 + now * .0021 + line * 1.7) * (5 + line % 4 * 2);
         const staticJump = Math.sin(x * .19 + now * .006 + line) * 2.2;
         const y = baseY + interference + staticJump;

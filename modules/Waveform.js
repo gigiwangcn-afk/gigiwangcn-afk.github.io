@@ -9,7 +9,8 @@ export class Waveform {
 
   resize() {
     const bounds = this.canvas.getBoundingClientRect();
-    const scale = Math.min(2, window.devicePixelRatio || 1);
+    const mobileMode = window.matchMedia('(pointer: coarse)').matches || window.innerWidth <= 760;
+    const scale = mobileMode ? 1 : Math.min(2, window.devicePixelRatio || 1);
     this.canvas.width = Math.max(1, Math.floor(bounds.width * scale));
     this.canvas.height = Math.max(1, Math.floor(bounds.height * scale));
   }

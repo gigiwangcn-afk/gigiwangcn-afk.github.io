@@ -18,13 +18,19 @@ export class RadioDial {
 
   bind() {
     this.element.addEventListener('pointerdown', (event) => {
+      event.preventDefault();
       this.dragging = true;
       this.lastPointerAngle = this.pointerAngle(event);
-      this.element.setPointerCapture(event.pointerId);
       this.onInteraction();
+      try {
+        this.element.setPointerCapture?.(event.pointerId);
+      } catch {
+        // Some embedded mobile browsers expose Pointer Events without capture support.
+      }
     });
     this.element.addEventListener('pointermove', (event) => {
       if (!this.dragging) return;
+      event.preventDefault();
       const angle = this.pointerAngle(event);
       let delta = angle - this.lastPointerAngle;
       if (delta > 180) delta -= 360;
@@ -35,6 +41,32 @@ export class RadioDial {
     const end = () => { this.dragging = false; };
     this.element.addEventListener('pointerup', end);
     this.element.addEventListener('pointercancel', end);
+    this.element.addEventListener('lostpointercapture', end);
+
+    if (!('PointerEvent' in window)) {
+      this.element.addEventListener('touchstart', (event) => {
+        const touch = event.touches[0];
+        if (!touch) return;
+        event.preventDefault();
+        this.dragging = true;
+        this.lastPointerAngle = this.pointerAngle(touch);
+        this.onInteraction();
+      }, { passive: false });
+      this.element.addEventListener('touchmove', (event) => {
+        if (!this.dragging) return;
+        const touch = event.touches[0];
+        if (!touch) return;
+        event.preventDefault();
+        const angle = this.pointerAngle(touch);
+        let delta = angle - this.lastPointerAngle;
+        if (delta > 180) delta -= 360;
+        if (delta < -180) delta += 360;
+        this.lastPointerAngle = angle;
+        this.setTarget(this.targetValue + delta * ((this.max - this.min) / 270));
+      }, { passive: false });
+      this.element.addEventListener('touchend', end);
+      this.element.addEventListener('touchcancel', end);
+    }
     this.element.addEventListener('wheel', (event) => {
       event.preventDefault();
       this.onInteraction();

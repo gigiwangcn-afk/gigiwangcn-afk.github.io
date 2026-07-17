@@ -157,20 +157,23 @@ function tune(frequency) {
 }
 
 dial.onChange = tune;
-dial.onInteraction = async () => {
-  if (!powered) await setPower(true);
+dial.onInteraction = () => {
+  if (!powered) setPower(true);
 };
 
-async function setPower(next) {
+function setPower(next) {
   powered = next;
   els.power.setAttribute('aria-pressed', String(powered));
   els.power.querySelector('span').textContent = powered ? 'RECEIVING' : 'RECEIVE';
   els.power.querySelector('.power-switch__cn').textContent = powered ? '接收中' : '启动接收';
   els.receiver.classList.toggle('is-powered', powered);
   if (powered) {
-    await audio.start();
-    audio.setMemory(currentSignal.memory?.id ?? null);
-    audio.setClarity(currentSignal.clarity);
+    audio.start().then(() => {
+      audio.setMemory(currentSignal.memory?.id ?? null);
+      audio.setClarity(currentSignal.clarity);
+    }).catch((error) => {
+      console.warn('Audio is unavailable; visual tuning remains active.', error);
+    });
   } else {
     audio.setClarity(0);
     audio.suspend();
@@ -180,13 +183,19 @@ async function setPower(next) {
 els.power.addEventListener('click', () => setPower(!powered));
 
 let previous = performance.now();
+let previousDraw = 0;
+const mobileMode = window.matchMedia('(pointer: coarse)').matches || window.innerWidth <= 760;
+const drawInterval = 1000 / (mobileMode ? 22 : 40);
 function frame(now) {
   const delta = Math.min(32, now - previous);
   previous = now;
   dial.update(delta);
-  reveal.draw(now);
-  noise.draw(now);
-  waveform.draw(now, audio.analyser);
+  if (now - previousDraw >= drawInterval) {
+    previousDraw = now;
+    reveal.draw(now);
+    noise.draw(now);
+    waveform.draw(now, audio.analyser);
+  }
   requestAnimationFrame(frame);
 }
 
@@ -196,7 +205,7 @@ window.addEventListener('resize', () => {
   waveform.resize();
 });
 
-Promise.all([reveal.load(), audio.prepare()]).finally(() => {
-  tune(dial.value);
-  requestAnimationFrame(frame);
-});
+tune(dial.value);
+requestAnimationFrame(frame);
+reveal.load().catch((error) => console.warn('Memory images are still loading.', error));
+audio.prepare().catch((error) => console.warn('Audio archive is still loading.', error));

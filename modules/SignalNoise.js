@@ -9,7 +9,8 @@ export class SignalNoise {
 
   resize() {
     const rect = this.canvas.getBoundingClientRect();
-    const scale = Math.min(1.5, window.devicePixelRatio || 1);
+    this.mobileMode = window.matchMedia('(pointer: coarse)').matches || window.innerWidth <= 760;
+    const scale = this.mobileMode ? 1 : Math.min(1.5, window.devicePixelRatio || 1);
     this.canvas.width = Math.max(1, Math.floor(rect.width * scale));
     this.canvas.height = Math.max(1, Math.floor(rect.height * scale));
   }
@@ -23,7 +24,7 @@ export class SignalNoise {
     const ctx = this.context;
     ctx.clearRect(0, 0, width, height);
 
-    const grainAmount = Math.floor(260 + (1 - this.clarity) * 850);
+    const grainAmount = Math.floor((260 + (1 - this.clarity) * 850) * (this.mobileMode ? .42 : 1));
     ctx.fillStyle = `rgba(25, 31, 25, ${.035 + (1 - this.clarity) * .11})`;
     for (let index = 0; index < grainAmount; index += 1) {
       const size = Math.random() < .94 ? 1 : 2 + Math.random() * 5;
